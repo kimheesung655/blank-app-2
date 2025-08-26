@@ -2,9 +2,10 @@ import streamlit as st
 import random
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image, ImageDraw
+from io import BytesIO  # <- 추가
 
 # -------------------------------
-# 세션 상태 안전 초기화 (맨 위)
+# 세션 상태 안전 초기화
 # -------------------------------
 if "apples" not in st.session_state:
     st.session_state["apples"] = [random.randint(1, 9) for _ in range(170)]
@@ -65,15 +66,20 @@ for i, apple in enumerate(st.session_state["apples"]):
     c = i % cols_per_row
     x, y = c * cell_size, r * cell_size
 
-    # 빨간 동그라미
     draw.ellipse([x+2, y+10, x+cell_size-2, y+cell_size-2], fill="red")
-    # 초록색 잎사귀
     draw.polygon(
         [(x+cell_size//2, y), (x+cell_size//2 -5, y+10), (x+cell_size//2 +5, y+10)],
         fill="green"
     )
-    # 숫자 표시
     draw.text((x + cell_size//3, y + cell_size//2), str(apple), fill="white")
+
+# -------------------------------
+# PIL 이미지를 BytesIO로 변환
+# -------------------------------
+board_bytes = BytesIO()
+board.save(board_bytes, format="PNG")
+board_bytes.seek(0)
+board_img = Image.open(board_bytes)
 
 # -------------------------------
 # 드래그 캔버스 생성
@@ -82,7 +88,7 @@ canvas_result = st_canvas(
     fill_color="rgba(0,0,255,0.15)",
     stroke_color="blue",
     stroke_width=2,
-    background_image=board,
+    background_image=board_img,  # <- BytesIO로 만든 이미지 사용
     update_streamlit=True,
     width=width,
     height=height,
@@ -129,7 +135,7 @@ if st.session_state["drag_done"]:
         fill_color="rgba(0,0,255,0.15)",
         stroke_color="blue",
         stroke_width=2,
-        background_image=board,
+        background_image=board_img,
         update_streamlit=True,
         width=width,
         height=height,
