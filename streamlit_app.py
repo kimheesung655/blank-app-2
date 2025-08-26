@@ -66,11 +66,14 @@ for i, apple in enumerate(st.session_state["apples"]):
     c = i % cols_per_row
     x, y = c * cell_size, r * cell_size
 
+    # 빨간 동그라미
     draw.ellipse([x+2, y+10, x+cell_size-2, y+cell_size-2], fill="red")
+    # 초록색 잎사귀
     draw.polygon(
         [(x+cell_size//2, y), (x+cell_size//2 -5, y+10), (x+cell_size//2 +5, y+10)],
         fill="green"
     )
+    # 숫자 표시
     draw.text((x + cell_size//3, y + cell_size//2), str(apple), fill="white")
 
 # -------------------------------
